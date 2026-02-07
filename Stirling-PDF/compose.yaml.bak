@@ -1,0 +1,48 @@
+#version: "3.7"
+services:
+  tailscale_stirling-pdf:
+    image: tailscale/tailscale:latest
+    container_name: Tailscale_Stirling-PDF
+    hostname: Stirling-PDF
+    environment:
+      TS_AUTHKEY: /run/secrets/ts_authkey
+      TS_EXTRA_ARGS: --advertise-tags=tag:container
+      TS_STATE_DIR: /var/lib/tailscale
+    secrets:
+      - ts_authkey
+    volumes:
+      - tailscale-data:/var/lib/tailscale
+      - tailscale-config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: unless-stopped
+
+  stirling-pdf:
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
+    container_name: Stirling-PDF
+    network_mode: service:tailscale_stirling-pdf
+    restart: unless-stopped
+    depends_on:
+      - tailscale_stirling-pdf
+    volumes:
+      - ${HOME}/.stirling-pdf/trainingData:/usr/share/tessdata # Required for extra OCR languages
+      - ${HOME}/.stirling-pdf/extraConfigs:/configs
+      - ${HOME}/.stirling-pdf/customFiles:/customFiles/
+      - ${HOME}/.stirling-pdf/logs:/logs/
+      - ${HOME}/.stirling-pdf/pipeline:/pipeline/
+    environment:
+      - DISABLE_ADDITIONAL_FEATURES=false
+      - LANGS=en_US
+
+secrets:
+  ts_authkey:
+    file: ${HOME}/.tailscale/Stirling-PDF/stirling-pdf_authkey.txt
+
+volumes:
+  tailscale-data:
+    driver: local
+  tailscale-config:
+    driver: local

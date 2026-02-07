@@ -1,0 +1,16 @@
+#version: '3.4'
+
+services:
+  muse:
+    image: ghcr.io/museofficial/muse:latest
+    container_name: Muse
+    hostname: Muse
+    restart: unless-stopped
+    volumes:
+      - ./muse:/data
+    environment:
+      - CACHE_LIMIT=2GB
+      - ENABLE_SPONSORBLOCK=true
+      - SPONSORBLOCK_TIMEOUT=5
+    env_file:
+      - ${HOME}/.muse/.env

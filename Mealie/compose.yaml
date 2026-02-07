@@ -1,0 +1,65 @@
+#version: "3.7"
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: Mealie
+    hostname: Mealie
+    labels:
+      io.portainer.accesscontrol.users: admin
+    ports:
+        - "9925:9000"
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - mealie-data:/app/data/
+    environment:
+    # Set Backend ENV Variables Here
+      - ALLOW_SIGNUP=false
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - MAX_WORKERS=1
+      - WEB_CONCURRENCY=1
+      - BASE_URL=http://localhost:9000
+
+    # Database Settings
+      - DB_ENGINE=postgres
+      - POSTGRES_USER=mealie
+      - POSTGRES_PASSWORD=mealie
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=mealie
+    restart: unless-stopped
+
+  postgres:
+    container_name: Postgres
+    image: postgres:15
+    restart: unless-stopped
+    labels:
+      io.portainer.accesscontrol.users: admin
+    volumes:
+      - ./mealie-pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: mealie
+    secrets:
+      - POSTGRES_PASSWORD
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  mealie-data:
+    driver: local
+  mealie-pgdata:
+    driver: local
+
+secrets:
+  POSTGRES_PASSWORD:
+    file: ${HOME}/.mealie/postgrespassword.txt

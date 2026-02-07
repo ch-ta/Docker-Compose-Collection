@@ -1,0 +1,18 @@
+#version: "3.7"
+services:
+  stirling-pdf:
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
+    container_name: Stirling-PDF
+    hostname: Stirling-PDF
+    restart: unless-stopped
+    ports:
+      - '8083:8080'
+    volumes:
+      - ${HOME}/.stirling-pdf/trainingData:/usr/share/tessdata # Required for extra OCR languages
+      - ${HOME}/.stirling-pdf/extraConfigs:/configs
+      - ${HOME}/.stirling-pdf/customFiles:/customFiles/
+      - ${HOME}/.stirling-pdf/logs:/logs/
+      - ${HOME}/.stirling-pdf/pipeline:/pipeline/
+    environment:
+      - DISABLE_ADDITIONAL_FEATURES=false
+      - LANGS=en_US

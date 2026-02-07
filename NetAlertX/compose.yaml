@@ -1,0 +1,21 @@
+#version: "3"
+services:
+  netalertx:
+    container_name: NetAlertX
+    hostname: NetAlertX
+    # use the below line if you want to test the latest dev image
+    # image: "jokobsk/netalertx-dev:latest" 
+    image: "jokobsk/netalertx:latest"
+    network_mode: "host"
+    restart: unless-stopped
+    labels:
+      io.portainer.accesscontrol.users: admin
+    volumes:
+      - /opt/netalertx/config:/app/config
+      - /opt/netalertx/db:/app/db
+      - /opt/netalertx/api:/app/api
+      # (optional) useful for debugging if you have issues setting up the container
+      - /opt/netalertx/logs:/app/front/log
+    environment:
+      - TZ=America/Los_Angeles
+      - PORT=20211

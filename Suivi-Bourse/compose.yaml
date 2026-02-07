@@ -1,0 +1,13 @@
+services:
+  suivi-bourse:
+    container_name: Suivi-Bourse
+    hostname: Suivi-Bourse
+    environment:
+      - SB_SCRAPING_INTERVAL=${SCRAPING_INTERVAL}
+    image: ghcr.io/pbrissaud/suivi-bourse-app:latest
+    ports:
+      - 8082:8081
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - ./config.yaml:/home/appuser/.config/SuiviBourse/config.yaml:ro

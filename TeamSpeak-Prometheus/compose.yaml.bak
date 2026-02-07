@@ -1,0 +1,24 @@
+services:
+  teamspeak-prometheus:
+    image: teamspeak-prometheus:latest
+    container_name: TeamSpeak-Prometheus
+    hostname: TeamSpeak-Prometheus
+    restart: unless-stopped
+    environment:
+      TEAMSPEAK_HOST: ${TEAMSPEAK_HOST:-172.17.0.1}
+      TEAMSPEAK_PORT: 10011
+    secrets:
+      - TEAMSPEAK_USERNAME
+      - TEAMSPEAK_PASSWORD
+    ports:
+      - 8002:8000
+    command: >
+      sh -c "export TEAMSPEAK_USERNAME=$(cat /run/secrets/TEAMSPEAK_USERNAME) &&
+             export TEAMSPEAK_PASSWORD=$(cat /run/secrets/TEAMSPEAK_PASSWORD) &&
+             python app.py"
+
+secrets:
+  TEAMSPEAK_USERNAME:
+    file: ~/.teamspeak/teamspeakusername.txt
+  TEAMSPEAK_PASSWORD:
+    file: ~/.teamspeak/teamspeakpassword.txt

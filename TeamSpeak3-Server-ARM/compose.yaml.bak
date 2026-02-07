@@ -1,0 +1,16 @@
+#version: '3'
+services:
+  teamspeak:
+    container_name: TeamSpeak3_Server
+    hostname: TeamSpeak3_Server
+    image: ertagh/teamspeak3-server:latest-box
+    network_mode: host
+    environment:
+      - TS_UPDATE=1
+      - TIME_ZONE=America/Los_Angeles
+    ports:
+      - "9987:9987/udp"
+      - "10011:10011/tcp"
+      - "30033:30033/tcp"
+    volumes:
+      - ${HOME}/.teamspeak/save/:/teamspeak/save/

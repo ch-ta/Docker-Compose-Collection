@@ -1,0 +1,19 @@
+#version: "3"
+services:
+  apprise:
+    build: .
+    container_name: Apprise
+    hostname: Apprise
+    image: "caronc/apprise:latest"
+    labels:
+      io.portainer.accesscontrol.users: admin
+    environment:
+      - APPRISE_STATEFUL_MODE=simple
+      - APPRISE_WORKER_COUNT=1
+    ports:
+      - 8001:8000
+    restart: unless-stopped
+    volumes:
+      - ${HOME}/.apprise/config:/config
+      - /var/lib/apprise/plugin:/plugin
+      - ${HOME}/.apprise/attach:/attach

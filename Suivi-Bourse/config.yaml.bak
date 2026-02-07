@@ -1,0 +1,19 @@
+shares:
+- name: Apple
+  symbol: AAPL # Yahoo! finance stock symbol
+  purchase:
+    quantity: 1
+    fee: 2 # Fees when I bought the share 
+    cost_price: 119.98  # Value of the share when I bought it 
+  estate:
+    quantity: 2 # Because, I got one free
+    received_dividend: 2.85 # Sum of all received dividend
+- name: Tesla
+  symbol: TLSA
+  purchase:
+    quantity: 3
+    fee: 5.8 # When buying multiple shares, sum of fees
+    cost_price: 856.87  # When buying multiple shares with different price, weighted average
+  estate:
+    quantity: 3
+    received_dividend: 4.57

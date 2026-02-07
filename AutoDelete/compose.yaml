@@ -1,0 +1,13 @@
+#version: "3"
+services:
+  autodelete:
+    image: jacoknapp/autodelete-discord:latest
+    container_name: AutoDelete
+    ports:
+      - 2202:2202
+    volumes:
+      - type: bind
+        source: ${HOME}/.autodelete/config.yml
+        target: /autodelete/config.yml
+      - ${HOME}/.autodelete/data/:/autodelete/data/
+    restart: unless-stopped

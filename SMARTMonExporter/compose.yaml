@@ -1,0 +1,13 @@
+#version: "3"
+services:
+  promfile-server:
+    image: python:3.9-slim
+    container_name: PromFile-Server
+    hostname: PromFile-Server
+    restart: unless-stopped
+    working_dir: /data
+    volumes:
+      - /var/lib/node_exporter/textfile_collector:/data:ro
+    command: python3 -m http.server 9103
+    ports:
+      - "9103:9103"
