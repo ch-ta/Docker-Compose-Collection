@@ -1,0 +1,79 @@
+# https://github.com/teamspeak/teamspeak6-server
+services:
+  teamspeak:
+    image: teamspeaksystems/teamspeak6-server:latest
+    container_name: TeamSpeak6_Server
+    hostname: TeamSpeak6_Server
+    ports:
+      - "9987:9987/udp"   # Default voice port
+      - "30033:30033/tcp" # File transfer port
+      # - "10080:10080/tcp" # WebQuery port
+      # - "10022:10022/tcp" # SSHQuery port
+    environment:
+      - TSSERVER_LICENSE_ACCEPTED=accept
+      - TSSERVER_DEFAULT_PORT=9987
+      - TSSERVER_VOICE_IP=0.0.0.0
+      - TSSERVER_FILE_TRANSFER_PORT=30033
+      - TSSERVER_FILE_TRANSFER_IP=0.0.0.0
+      # - TSSERVER_QUERY_HTTP_ENABLED=true
+      # - TSSERVER_QUERY_SSH_ENABLED=true
+
+      # Database settings
+      - TSSERVER_DATABASE_PLUGIN=mariadb
+      - TSSERVER_DATABASE_SQL_CREATE_PATH=create_mariadb
+      - TSSERVER_DATABASE_HOST=mariadb
+      - TSSERVER_DATABASE_PORT=3306
+#      - TSSERVER_DATABASE_NAME=teamspeak
+#      - TSSERVER_DATABASE_USERNAME=teamspeak
+#      - TSSERVER_DATABASE_PASSWORD=YourPasswordHere
+    env_file:
+      - ${HOME}/.teamspeak/.env
+    volumes:
+      - ${HOME}/.teamspeak/teamspeak-data:/var/tsserver
+    networks:
+      - teamspeak-network
+      - teamspeakdb-network
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  mariadb:
+    image: mariadb:latest
+    container_name: TeamSpeak6_Server_DB
+    hostname: TeamSpeak6_Server_DB
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=SuperSecretPassword
+#      - MYSQL_DATABASE=teamspeak
+#      - MYSQL_USER=teamspeak
+#      - MYSQL_PASSWORD=YourPasswordHere
+    env_file:
+      - ${HOME}/.teamspeak/.dbenv
+    volumes:
+      - ${HOME}/.teamspeak/mariadb-data:/var/lib/mysql
+    networks:
+      - teamspeakdb-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  teamspeak-data:
+    name: teamspeak-data
+  mariadb-data:
+    name: mariadb-data
+
+networks:
+  teamspeak-network:
+    name: teamspeak-network
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: ts-bridge
+  teamspeakdb-network:
+    name: teamspeakdb-network
+    driver: bridge
+    internal: true

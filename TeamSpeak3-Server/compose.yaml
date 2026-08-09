@@ -1,0 +1,29 @@
+#version: '3'
+services:
+  teamspeak:
+    container_name: TeamSpeak3_Server
+    hostname: TeamSpeak3_Server
+    image: ertagh/teamspeak3-server:latest-box
+    restart: unless-stopped
+    networks:
+      - teamspeak-network
+#      teamspeak-network:
+#        ipv4_address: 172.27.0.1
+    entrypoint: ["/bin/sh", "-c", "sleep 240 && exec /init"]
+    environment:
+      - TS_UPDATE=1
+      - TIME_ZONE=America/Los_Angeles
+    ports:
+      - "9987:9987/udp"
+      - "10011:10011/tcp"
+      - "30033:30033/tcp"
+    volumes:
+      - ${HOME}/.teamspeak/save/:/teamspeak/save/
+
+networks:
+  teamspeak-network:
+    name: teamspeak-network
+    driver: bridge
+#    ipam:
+#      config:
+#        - subnet: 172.27.0.0/24

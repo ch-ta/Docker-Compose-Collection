@@ -3,7 +3,6 @@ services:
   mealie:
     image: ghcr.io/mealie-recipes/mealie:latest
     container_name: Mealie
-    hostname: Mealie
     labels:
       io.portainer.accesscontrol.users: admin
     ports:
@@ -17,6 +16,9 @@ services:
         condition: service_healthy
     volumes:
       - mealie-data:/app/data/
+    networks:
+      - mealie-network
+      - mealiedb-network
     environment:
     # Set Backend ENV Variables Here
       - ALLOW_SIGNUP=false
@@ -26,14 +28,31 @@ services:
       - MAX_WORKERS=1
       - WEB_CONCURRENCY=1
       - BASE_URL=http://localhost:9000
-
+      - SMTP_HOST=/run/secrets/SMTP_HOST
+      - SMTP_PORT=/run/secrets/SMTP_PORT
+      - SMTP_FROM_NAME=Mealie
+      - SMTP_AUTH_STRATEGY=/run/secrets/SMTP_AUTH_STRATEGY
+      - SMTP_FROM_EMAIL=/run/secrets/SMTP_FROM_EMAIL
+      - SMTP_USER=/run/secrets/SMTP_USER
+      - SMTP_PASSWORD=/run/secrets/SMTP_PASSWORD
     # Database Settings
       - DB_ENGINE=postgres
-      - POSTGRES_USER=mealie
-      - POSTGRES_PASSWORD=mealie
+#      - POSTGRES_USER=mealie
+#      - POSTGRES_PASSWORD=mealie
       - POSTGRES_SERVER=postgres
-      - POSTGRES_PORT=5432
+#      - POSTGRES_PORT=5432
       - POSTGRES_DB=mealie
+    secrets:
+#      - BASE_URL
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_AUTH_STRATEGY
+      - SMTP_FROM_EMAIL
+      - SMTP_USER
+      - SMTP_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
     restart: unless-stopped
 
   postgres:
@@ -43,10 +62,14 @@ services:
     labels:
       io.portainer.accesscontrol.users: admin
     volumes:
-      - ./mealie-pgdata:/var/lib/postgresql/data
+      - ${HOME}/.mealie/mealie-pgdata:/var/lib/postgresql/data
+    networks:
+      - mealiedb-network
     environment:
-      POSTGRES_USER: mealie
+      POSTGRES_USER: /run/secrets/POSTGRES_USER
+      POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
     secrets:
+      - POSTGRES_USER
       - POSTGRES_PASSWORD
     healthcheck:
       test: ["CMD", "pg_isready"]
@@ -60,6 +83,33 @@ volumes:
   mealie-pgdata:
     driver: local
 
+networks:
+  mealie-network:
+    name: mealie-network
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: mealie-bridge
+  mealiedb-network:
+    name: mealiedb-network
+    driver: bridge
+    internal: true
+
 secrets:
+  POSTGRES_USER:
+    file: ${HOME}/.mealie/secrets/postgres-user.txt
   POSTGRES_PASSWORD:
-    file: ${HOME}/.mealie/postgrespassword.txt
+    file: ${HOME}/.mealie/secrets/postgres-password.txt
+  POSTGRES_PORT:
+    file: ${HOME}/.mealie/secrets/postgres-port.txt
+  SMTP_HOST:
+    file: ${HOME}/.mealie/secrets/smtp-host.txt
+  SMTP_PORT:
+    file: ${HOME}/.mealie/secrets/smtp-port.txt
+  SMTP_AUTH_STRATEGY:
+    file: ${HOME}/.mealie/secrets/smtp-auth-strategy.txt
+  SMTP_FROM_EMAIL:
+    file: ${HOME}/.mealie/secrets/smtp-from-email.txt
+  SMTP_USER:
+    file: ${HOME}/.mealie/secrets/smtp-user.txt
+  SMTP_PASSWORD:
+    file: ${HOME}/.mealie/secrets/smtp-password.txt

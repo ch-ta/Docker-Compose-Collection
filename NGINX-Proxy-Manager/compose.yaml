@@ -1,7 +1,7 @@
 services:
   nginx-proxy-manager:
     container_name: NGINX-Proxy-Manager
-    hostname: NGINX-Proxy-Manager
+    #hostname: "Raspberry Pi 4"
     image: 'jc21/nginx-proxy-manager:latest'
     restart: unless-stopped
     ports:
@@ -12,5 +12,5 @@ services:
       DB_SQLITE_FILE: "/data/database.sqlite"
       DISABLE_IPV6: 'false'
     volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
+      - ${HOME}/.nginx/data:/data
+      - ${HOME}/.nginx/letsencrypt:/etc/letsencrypt

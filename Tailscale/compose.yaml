@@ -7,14 +7,15 @@ services:
     network_mode: host
     privileged: true
     environment:
+      TS_STATE_DIR: /var/lib/tailscale
       TS_USERSPACE: false
       TS_EXTRA_ARGS: --advertise-tags=tag:container,tag:subnet
       TS_HOSTNAME: RaspberryPi4
     env_file:
       - ${HOME}/.tailscale/.env
     volumes:
-      - tailscale-data:/var/lib/tailscale
       - tailscale-config:/config
+      - ${HOME}/.tailscale/state:/var/lib/tailscale
     devices:
       - /dev/net/tun:/dev/net/tun
     cap_add:

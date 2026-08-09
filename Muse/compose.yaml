@@ -7,7 +7,7 @@ services:
     hostname: Muse
     restart: unless-stopped
     volumes:
-      - ./muse:/data
+      - ${HOME}/.muse/data:/data
     environment:
       - CACHE_LIMIT=2GB
       - ENABLE_SPONSORBLOCK=true
