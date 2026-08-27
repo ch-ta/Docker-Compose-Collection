@@ -24,3 +24,5 @@ Stacks:<br/>
 - [TeamSpeak3-Server-ARM](https://github.com/ertagh/teamspeak3-server-arm)<br/>
 - [TeamSpeak-Prometheus](https://github.com/TilmannF/teamspeak-prometheus)<br/>
 • Clone the original TeamSpeak-Prometheus repository and build the Docker image yourself. `docker build -t teamspeak-prometheus .`<br/>
+
+
